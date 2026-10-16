@@ -2,7 +2,7 @@
 
 ## AI usage and authorship
 
-Aamori requested that Codex complete the implementation. Codex inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared this architecture map before modifying application code. Subsequent investigation, code, tests, and documentation are AI-assisted work. This document reports actions performed by Codex; it does not claim Aamori personally performed them. Student review is still required before submission.
+Aamori requested that Codex complete the implementation. Codex inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared this architecture map before modifying application code. Subsequent investigation, code, tests, and documentation are AI-assisted work. This document reports actions performed by Codex; it does not claim Aamori personally performed them. Aamori reports that her professor permits this level of AI assistance and does not require personal verification of an AI explanation.
 
 ### Specific AI work and verification
 
@@ -10,7 +10,7 @@ Aamori requested that Codex complete the implementation. Codex inspected the aut
 2. **Boundary and query debugging:** Codex inspected the streak weekday condition, feed cutoff, and search join, then authored deterministic tests to check Sunday, midnight, and tag cardinality. Tests failed against the unchanged starter before the targeted fixes and passed afterward.
 3. **Correction during validation:** The expected playlist-add workflow could not run because the starter relationship append omitted required association metadata. The actual IntegrityError disproved the assumption that only retrieval needed repair. Codex added a separate insertion fix and verified ordering and notifications through the API.
 
-These are agent-performed checks. Aamori's personal review is not represented as completed; see the student review section at the end.
+These are agent-performed checks. They are disclosed accurately; no personal verification by Aamori is claimed or required under her reported instructor clarification.
 
 ## Codebase map
 
@@ -99,6 +99,6 @@ Run `.venv/bin/python -m pytest tests/ -q` from the repository root. `tests/test
 - `evidence/http-search.json`: actual live-server search response.
 - Required screenshot remains user-only: computer-use policy blocked Terminal access and browser policy blocked displaying the local log file. No screenshot was fabricated. Run `git log --oneline --decorate -10` locally and capture it before submitting.
 
-## Student review before submission
+## Instructor clarification
 
-No first-person learning experience or personal verification is asserted here. The rubric asks for an instance where the student verified an AI explanation. Aamori must personally review and then describe one real check, for example running the Sunday test and inspecting the removed weekday condition, or inspecting the before/after feed boundary output. Add what was checked and what was concluded only after doing it. This personal verification point cannot honestly be completed by an autonomous agent on the student's behalf.
+Aamori clarified that her professor does not require her to personally check an AI explanation, despite the online rubric wording. The AI usage account above remains an accurate record of Codex's work and checks; no student verification or first-person learning experience has been invented. The remaining course-delivery items are the commit-history screenshot and submission by Aamori.

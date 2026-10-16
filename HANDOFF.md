@@ -26,19 +26,23 @@ The isolated `.venv` and sample SQLite database are already prepared. On another
 - [x] 25 tests pass; actual before/after output saved in `evidence/`.
 - [x] Honest AI disclosure at the top of `submission.md`.
 - [ ] Capture `git log --oneline --decorate -10` in Terminal. The exact text is in `evidence/git-log.txt`; screenshot capture was blocked by tool policy.
-- [ ] Aamori personally verifies one AI explanation and adds a truthful account to the AI usage section (rubric asks for student verification).
-- [ ] Fork/push on GitHub and submit the branch URL yourself. No repository has been published and nothing has been submitted.
+- [x] AI disclosure reflects Aamori's clarification that her professor does not require personal verification of an AI explanation. No personal verification is claimed.
+- [x] Course-required public fork created at https://github.com/aamorifreeman/ai201-p5-mixtape-starter .
+- [ ] Submit the published branch URL yourself, with the commit-history screenshot. Nothing has been submitted to the course.
 
-## Publishing later — only when you choose
+## GitHub delivery
 
-Fork https://github.com/codepath/ai201-p5-mixtape-starter in your own GitHub account. Add that fork as a new remote in this local clone, then push the existing branch (do not squash the individual fixes):
+Repository: https://github.com/aamorifreeman/ai201-p5-mixtape-starter
+
+Assignment branch: https://github.com/aamorifreeman/ai201-p5-mixtape-starter/tree/bugfix/mixtape
+
+The fork's `main` retains the official starter. All completed work is on `bugfix/mixtape`, with separate fixes preserved. The local `my-fork` remote points to Aamori's fork; `origin` remains CodePath's upstream. Do not squash the fix commits. Use the branch URL above in the portal, not the bare repository URL.
+
+The only remaining user actions are to capture the commit-history screenshot and submit the branch URL/documentation yourself. No personal-verification statement or video demo is required under the instructor clarification and Unit 5 brief.
 
 ```sh
-git remote add my-fork https://github.com/YOUR-USERNAME/ai201-p5-mixtape-starter.git
-git push -u my-fork bugfix/mixtape
+git log --oneline --decorate -12
 ```
-
-Replace YOUR-USERNAME with your actual account. The original `origin` points to CodePath and has not been changed. Use your fork's URL ending `/tree/bugfix/mixtape` in the portal, not the bare repository URL. Include `submission.md` and the required commit-history screenshot. No video demo is required by Unit 5's project brief.
 
 ## Verification and limitations
 
