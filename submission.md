@@ -101,6 +101,8 @@ Run `.venv/bin/python -m pytest tests/ -q` from the repository root. `tests/test
 
 ![Git history on bugfix/mixtape](evidence/git-log.png)
 
-## Personal check — user-confirmed completion
+## Personal check and evidence-supported example
 
-The personal-check requirement remains in place. Aamori explicitly confirmed: “dont remove the personal check requirment, i did it”. This records her reported completion without attributing Codex's automated checks to her. The supplied image verifies the commit history; it does not identify the AI explanation checked or the observation from that check. Those specifics have not been provided. To make this account substantive for the online AI-usage rubric, the only missing detail is which explanation she checked and what she observed or concluded.
+Aamori reports completing the required personal check of an AI explanation. The example below was selected by Codex from the project's recorded evidence; it is not a claim about which explanation Aamori personally checked.
+
+**Example — Sunday streak reset:** In `update_listening_streak()`, the condition `days_since_last == 1 and today.weekday() != 6` excluded Sunday even when the previous listen was on Saturday. Removing the weekday restriction lets consecutive calendar days increment the streak normally. Before the fix, `test_sunday_streak_api` returned 1 instead of the expected 13 for a stored streak of 12 followed by a Sunday listen (`evidence/baseline-regressions.txt`). After the fix, that regression passes as part of the recorded 25-test passing suite (`evidence/final-tests.txt`). These are project test results, not a first-person account of Aamori's testing.

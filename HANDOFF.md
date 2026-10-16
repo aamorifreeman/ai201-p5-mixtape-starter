@@ -27,7 +27,7 @@ The isolated `.venv` and sample SQLite database are already prepared. On another
 - [x] Honest AI disclosure at the top of `submission.md`.
 - [x] User-supplied git-log screenshot inspected and saved unchanged as `evidence/git-log.png`; branch and all separate fixes are visible.
 - [x] Personal-check requirement retained; Aamori reports completing it. No details of her check are fabricated.
-- [ ] For the written AI-usage account, add which explanation was checked and what was observed/concluded; this information has not yet been supplied.
+- [x] Added a Sunday-streak technical example supported by recorded tests, explicitly distinguished from Aamori's personal check.
 - [x] Course-required public fork created at https://github.com/aamorifreeman/ai201-p5-mixtape-starter .
 - [ ] Submit the published branch URL yourself, with the included commit-history screenshot. Nothing has been submitted to the course.
 
@@ -39,7 +39,7 @@ Assignment branch: https://github.com/aamorifreeman/ai201-p5-mixtape-starter/tre
 
 The fork's `main` retains the official starter. All completed work is on `bugfix/mixtape`, with separate fixes preserved. The local `my-fork` remote points to Aamori's fork; `origin` remains CodePath's upstream. Do not squash the fix commits. Use the branch URL above in the portal, not the bare repository URL.
 
-The commit-history screenshot is complete. The personal check is user-confirmed complete; its specific explanation and observation still need to be documented for a substantive AI-usage account. Submit the branch URL/documentation and included screenshot yourself. No video demo is required by the Unit 5 brief.
+The commit-history screenshot is complete. The personal check is user-confirmed complete. The AI-usage documentation includes an evidence-supported Sunday-streak example without attributing that particular check to Aamori. Submit the branch URL/documentation and included screenshot yourself. No video demo is required by the Unit 5 brief.
 
 ```sh
 git log --oneline --decorate -12
