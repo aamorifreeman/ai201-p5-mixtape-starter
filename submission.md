@@ -41,3 +41,11 @@ Routes handle HTTP parsing and response formatting; services contain business lo
 - **The root cause:** `days_since_last == 1 and today.weekday() != 6` rejects Sunday even when the calendar date difference is exactly one. Sunday therefore falls into the reset branch. Consecutive-day counting must depend on elapsed calendar dates, not the weekday number.
 - **Your fix:** Removed the Sunday exclusion; all one-day differences increment the streak.
 - **Your side-effect check:** All five original streak tests and the new API test pass (6 total). These cover first listen, ordinary consecutive days, skipped days, Saturday→Sunday→Monday, same-day repeats, and event persistence (three listens still create three events while counting only two new days).
+
+**Issue #2 — Friends Listening Now shows people from yesterday**
+
+- **How you reproduced it:** At a frozen Sunday 09:00 UTC, inserted a friend's listen from Saturday 23:59 and requested `/feed/owner/listening-now`. Before the fix its count was 1; expected 0. Fixtures use an isolated in-memory database rather than relying on the wall clock or seed timing.
+- **How you found the root cause:** Codex followed `routes/feed.listening_now()` into `get_friends_listening_now()`, then inspected the event timestamp filter, ordering, and per-friend deduplication. The failing fixture was newer than the computed 24-hour cutoff but older than midnight, isolating the cutoff as the cause.
+- **The root cause:** Subtracting `RECENT_THRESHOLD` (24 hours) creates a rolling interval. Yesterday at 23:59 is still inside that interval at 09:00 today, although it is not on today's calendar date. The app uses UTC timestamps and has no user timezone field, so the calendar boundary is UTC midnight.
+- **Your fix:** Compute today's midnight UTC with `replace(hour=0, minute=0, second=0, microsecond=0)` and retain the inclusive `>=` timestamp filter. Removed the unused rolling-threshold constant/import and clarified the docstring.
+- **Your side-effect check:** Four feed test cases pass: yesterday 23:59 excluded, midnight included, today 08:59 included, and multiple events reduced to the latest per friend. The tests also verify strangers are excluded, friendless users get an empty list, missing users get 404, and the general activity feed still includes yesterday's event.
