@@ -25,6 +25,7 @@ The isolated `.venv` and sample SQLite database are already prepared. On another
 - [x] Separate repair for playlist insertion discovered during reproduction.
 - [x] 25 tests pass; actual before/after output saved in `evidence/`.
 - [x] Honest AI disclosure at the top of `submission.md`.
+- [ ] Capture `git log --oneline --decorate -10` in Terminal. The exact text is in `evidence/git-log.txt`; screenshot capture was blocked by tool policy.
 - [ ] Aamori personally verifies one AI explanation and adds a truthful account to the AI usage section (rubric asks for student verification).
 - [ ] Fork/push on GitHub and submit the branch URL yourself. No repository has been published and nothing has been submitted.
 

@@ -1,0 +1,10 @@
+c907532 (HEAD -> bugfix/mixtape) docs: record verification and local project handoff
+0458be4 fix: persist required ordering metadata when adding playlist songs
+b955b5e fix: return the final song in ordered playlist results
+b90623c fix: notify song sharers when other users rate their songs
+6173ca7 fix: avoid multiplying search results by song tag count
+481585f fix: filter listening-now feed from UTC midnight
+eec0c6f fix: preserve listening streak across Saturday to Sunday
+f1c63a7 test: reproduce five reported bugs and playlist insertion failure
+6edd05c docs: map Mixtape architecture before bug investigation
+aaead6a (origin/main, origin/HEAD, main) Merge pull request #45 from sarcb/fix/1216538223584876-search-dedup

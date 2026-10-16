@@ -95,7 +95,9 @@ Run `.venv/bin/python -m pytest tests/ -q` from the repository root. `tests/test
 - `evidence/baseline-tests.txt`: actual original-suite output, 4 failed / 9 passed.
 - `evidence/baseline-regressions.txt`: actual pre-fix new-suite output, 7 failed / 5 passed.
 - `evidence/final-tests.txt`: actual final full-suite output.
-- `evidence/git-log.png`: actual commit-history screenshot (prepared after the fixes).
+- `evidence/git-log.txt`: actual `git log --oneline --decorate -10` output, including all six separate fix commits.
+- `evidence/http-search.json`: actual live-server search response.
+- Required screenshot remains user-only: computer-use policy blocked Terminal access and browser policy blocked displaying the local log file. No screenshot was fabricated. Run `git log --oneline --decorate -10` locally and capture it before submitting.
 
 ## Student review before submission
 
