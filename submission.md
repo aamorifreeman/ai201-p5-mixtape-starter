@@ -31,3 +31,13 @@ This architectural orientation was recorded before bug reproduction and implemen
 ### Organization patterns
 
 Routes handle HTTP parsing and response formatting; services contain business logic and database queries. Models centralize relationships and serialization. The application factory supports isolated test databases. Time-producing code uses UTC, while SQLite DateTime retrieval may yield naive datetimes representing UTC. Playlist order is explicit data in the association table, not the order of song IDs.
+
+## Root cause analyses
+
+**Issue #1 — My listening streak keeps resetting**
+
+- **How you reproduced it:** Before fixes, the original Sunday test failed with 1 instead of 2. The added API test sets a stored streak of 12 and a Saturday timestamp, freezes the clock at Sunday June 16, 2024 09:00 UTC, posts a listen, then fetches the streak. It returned 1 instead of 13 (`evidence/baseline-regressions.txt`).
+- **How you found the root cause:** Codex traced `routes/songs.listen()` → `record_listening_event()` → `update_listening_streak()`, then checked the stored result through `routes/users.streak()` → `get_streak()`. The consecutive-day branch explicitly excluded weekday 6; the controlled Sunday failure confirmed this condition, rather than persistence or the GET endpoint, caused the reset.
+- **The root cause:** `days_since_last == 1 and today.weekday() != 6` rejects Sunday even when the calendar date difference is exactly one. Sunday therefore falls into the reset branch. Consecutive-day counting must depend on elapsed calendar dates, not the weekday number.
+- **Your fix:** Removed the Sunday exclusion; all one-day differences increment the streak.
+- **Your side-effect check:** All five original streak tests and the new API test pass (6 total). These cover first listen, ordinary consecutive days, skipped days, Saturday→Sunday→Monday, same-day repeats, and event persistence (three listens still create three events while counting only two new days).
