@@ -2,7 +2,7 @@
 
 ## AI usage and authorship
 
-Aamori requested that Codex complete the implementation. Codex inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared this architecture map before modifying application code. Subsequent investigation, code, tests, and documentation are AI-assisted work. This document reports actions performed by Codex; it does not claim Aamori personally performed them. Aamori reports that her professor permits this level of AI assistance and does not require personal verification of an AI explanation.
+Aamori requested that Codex complete the implementation. Codex inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared this architecture map before modifying application code. Subsequent investigation, code, tests, and documentation are AI-assisted work. This document reports actions performed by Codex; it does not claim Aamori personally performed them. Aamori confirms that she completed the personal check of an AI explanation. The personal-check requirement is retained.
 
 ### Specific AI work and verification
 
@@ -10,7 +10,7 @@ Aamori requested that Codex complete the implementation. Codex inspected the aut
 2. **Boundary and query debugging:** Codex inspected the streak weekday condition, feed cutoff, and search join, then authored deterministic tests to check Sunday, midnight, and tag cardinality. Tests failed against the unchanged starter before the targeted fixes and passed afterward.
 3. **Correction during validation:** The expected playlist-add workflow could not run because the starter relationship append omitted required association metadata. The actual IntegrityError disproved the assumption that only retrieval needed repair. Codex added a separate insertion fix and verified ordering and notifications through the API.
 
-These are agent-performed checks. They are disclosed accurately; no personal verification by Aamori is claimed or required under her reported instructor clarification.
+The detailed checks listed above were performed by Codex. Separately, Aamori reports completing her personal check of an AI explanation; she has not specified which explanation or what she observed, so those details are not invented.
 
 ## Codebase map
 
@@ -97,8 +97,10 @@ Run `.venv/bin/python -m pytest tests/ -q` from the repository root. `tests/test
 - `evidence/final-tests.txt`: actual final full-suite output.
 - `evidence/git-log.txt`: actual `git log --oneline --decorate -10` output, including all six separate fix commits.
 - `evidence/http-search.json`: actual live-server search response.
-- Required screenshot remains user-only: computer-use policy blocked Terminal access and browser policy blocked displaying the local log file. No screenshot was fabricated. Run `git log --oneline --decorate -10` locally and capture it before submitting.
+- `evidence/git-log.png`: screenshot supplied by Aamori, inspected and included unchanged. It shows `bugfix/mixtape` at `146a9ec` and all five separate required fix commits plus the related playlist insertion repair. Later documentation/evidence commits do not invalidate the displayed fix history.
 
-## Instructor clarification
+![Git history on bugfix/mixtape](evidence/git-log.png)
 
-Aamori clarified that her professor does not require her to personally check an AI explanation, despite the online rubric wording. The AI usage account above remains an accurate record of Codex's work and checks; no student verification or first-person learning experience has been invented. The remaining course-delivery items are the commit-history screenshot and submission by Aamori.
+## Personal check — user-confirmed completion
+
+The personal-check requirement remains in place. Aamori explicitly confirmed: “dont remove the personal check requirment, i did it”. This records her reported completion without attributing Codex's automated checks to her. The supplied image verifies the commit history; it does not identify the AI explanation checked or the observation from that check. Those specifics have not been provided. To make this account substantive for the online AI-usage rubric, the only missing detail is which explanation she checked and what she observed or concluded.

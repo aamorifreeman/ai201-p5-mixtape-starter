@@ -25,10 +25,11 @@ The isolated `.venv` and sample SQLite database are already prepared. On another
 - [x] Separate repair for playlist insertion discovered during reproduction.
 - [x] 25 tests pass; actual before/after output saved in `evidence/`.
 - [x] Honest AI disclosure at the top of `submission.md`.
-- [ ] Capture `git log --oneline --decorate -10` in Terminal. The exact text is in `evidence/git-log.txt`; screenshot capture was blocked by tool policy.
-- [x] AI disclosure reflects Aamori's clarification that her professor does not require personal verification of an AI explanation. No personal verification is claimed.
+- [x] User-supplied git-log screenshot inspected and saved unchanged as `evidence/git-log.png`; branch and all separate fixes are visible.
+- [x] Personal-check requirement retained; Aamori reports completing it. No details of her check are fabricated.
+- [ ] For the written AI-usage account, add which explanation was checked and what was observed/concluded; this information has not yet been supplied.
 - [x] Course-required public fork created at https://github.com/aamorifreeman/ai201-p5-mixtape-starter .
-- [ ] Submit the published branch URL yourself, with the commit-history screenshot. Nothing has been submitted to the course.
+- [ ] Submit the published branch URL yourself, with the included commit-history screenshot. Nothing has been submitted to the course.
 
 ## GitHub delivery
 
@@ -38,7 +39,7 @@ Assignment branch: https://github.com/aamorifreeman/ai201-p5-mixtape-starter/tre
 
 The fork's `main` retains the official starter. All completed work is on `bugfix/mixtape`, with separate fixes preserved. The local `my-fork` remote points to Aamori's fork; `origin` remains CodePath's upstream. Do not squash the fix commits. Use the branch URL above in the portal, not the bare repository URL.
 
-The only remaining user actions are to capture the commit-history screenshot and submit the branch URL/documentation yourself. No personal-verification statement or video demo is required under the instructor clarification and Unit 5 brief.
+The commit-history screenshot is complete. The personal check is user-confirmed complete; its specific explanation and observation still need to be documented for a substantive AI-usage account. Submit the branch URL/documentation and included screenshot yourself. No video demo is required by the Unit 5 brief.
 
 ```sh
 git log --oneline --decorate -12

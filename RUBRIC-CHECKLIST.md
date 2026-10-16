@@ -11,30 +11,25 @@ This is an evidence mapping, not a guaranteed grade or a claim of 28/28.
 | Root Cause Quality | 5 | At least three specific conditions/functions (2); at least two named mechanisms tied to trigger conditions (2); causal reasoning about date differences, join cardinality and final-element slicing (1). Prepared. |
 | Navigation Strategy | 4 | All five entries trace route → service → relevant model/query (2), with deliberate investigation and baseline test evidence (2). These actions were performed by Codex and disclosed, not falsely attributed to the student. |
 | Side-Effect Check | 3 | At least three specific related checks (2); API persistence, read/unread behavior, preserved tags and ordering go beyond startup (1). Prepared; 25 tests pass. |
-| Commit History | 3 | Actual local history identifies `bugfix/mixtape` (1), separate fixes (1), specific conventional `fix:` messages (1). Text evidence and full Git bundle included. Public fork created for aamorifreeman; branch publication is part of this delivery. Required screenshot remains pending. |
-| AI Usage | 3 | At least two specific navigation/debugging uses (1), specific collaboration detail (1), documented student verification/correction (1). Specific uses and agent verification are documented. Aamori reports that her professor waived the personal-verification requirement; no student verification is fabricated. |
+| Commit History | 3 | Actual local history identifies `bugfix/mixtape` (1), separate fixes (1), specific conventional `fix:` messages (1). Text evidence and full Git bundle included. Published public fork and branch verified; user-supplied `evidence/git-log.png` shows the branch and all separate fixes. Prepared. |
+| AI Usage | 3 | At least two specific navigation/debugging uses (1), specific collaboration detail (1), documented student verification/correction (1). Specific uses and agent verification are documented. Personal-check requirement retained; Aamori reports completion. The specific explanation she checked and her observation/conclusion have not yet been supplied; no details are fabricated. |
 
 ## Stretch mapping
 
 | Stretch | Points | Status |
 |---|---:|---|
-| Fix a fourth bug | +1 | Code, complete RCA and separate commit prepared. The rubric also asks that its commit be visible in the git-log screenshot; screenshot pending. |
-| Fix all five bugs | +1 | All five fixes, complete RCAs and separate commits prepared. Depends on fourth-bug stretch; screenshot pending. |
+| Fix a fourth bug | +1 | Code, complete RCA and separate commit prepared. Its separate commit is visible in the user-supplied git-log screenshot. Completed. |
+| Fix all five bugs | +1 | All five fixes, complete RCAs and separate commits prepared. All five separate commits are visible in the user-supplied git-log screenshot; fourth-bug stretch is also complete. Completed. |
 | Regression test | +1 | Satisfied in the local project: 12 new deterministic cases in `tests/test_regressions.py`, referenced and explained in `submission.md`; actual pre-fix failure output and post-fix pass output included. |
 
-No video demo is required. The course-required public fork is https://github.com/aamorifreeman/ai201-p5-mixtape-starter and the assignment branch URL is https://github.com/aamorifreeman/ai201-p5-mixtape-starter/tree/bugfix/mixtape . No course submission has been made. Final grading remains the instructor's decision; the screenshot evidence is still pending.
+No video demo is required. The course-required public fork is https://github.com/aamorifreeman/ai201-p5-mixtape-starter and the assignment branch URL is https://github.com/aamorifreeman/ai201-p5-mixtape-starter/tree/bugfix/mixtape . No course submission has been made. Final grading remains the instructor's decision. Screenshot evidence is complete; only the specific details of the user-confirmed personal check remain undocumented.
 
 ## Exact final steps for Aamori
 
-1. In Terminal, run the following and take a screenshot showing the branch and separate fix commits:
+1. Add a short factual account of which AI explanation you personally checked and what you observed/concluded. The check is already recorded as completed based on your confirmation; this asks only for its specifics, not a repeat of the check.
+2. Submit https://github.com/aamorifreeman/ai201-p5-mixtape-starter/tree/bugfix/mixtape , `submission.md`, and `evidence/git-log.png` yourself. The screenshot supplied by Aamori has been inspected and included unchanged. No additional screenshot or video is needed for these requirements.
 
-   ```sh
-   cd /Users/aamorifreeman/Documents/Codex/2026-10-16/task/ai201-p5-mixtape-starter
-   git log --oneline --decorate -12
-   ```
-
-   Screenshot is intentionally absent: tool policy blocked Terminal capture and local-file browser display. No alternative capture route was used after those denials.
-2. Submit https://github.com/aamorifreeman/ai201-p5-mixtape-starter/tree/bugfix/mixtape , `submission.md`, and the screenshot yourself. Per the instructor clarification, no personal AI-verification statement is required.
+If you want an updated screenshot after documentation-only commits, the command is `git log --oneline --decorate -12`; the supplied screenshot already shows all required fix commits.
 
 ## Archive layout and portable setup
 
