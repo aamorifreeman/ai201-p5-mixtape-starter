@@ -1,0 +1,368 @@
+FF...FF..FFF                                                             [100%]
+=================================== FAILURES ===================================
+____________________________ test_sunday_streak_api ____________________________
+
+sample = <FlaskClient <Flask 'app'>>
+
+    def test_sunday_streak_api(sample):
+        user = db.session.get(User, 'friend')
+        user.listening_streak = 12
+        user.last_listened_at = NOW - timedelta(days=1)
+        db.session.commit()
+        with patch('services.streak_service.datetime') as clock:
+            clock.now.return_value = NOW
+            assert sample.post('/songs/s0/listen', json={'user_id': 'friend'}).status_code == 201
+>           assert sample.get('/users/friend/streak').json['streak'] == 13
+E           assert 1 == 13
+
+tests/test_regressions.py:40: AssertionError
+___________________ test_feed_calendar_boundary[23-59-False] ___________________
+
+sample = <FlaskClient <Flask 'app'>>, hour = 23, minute = 59, included = False
+
+    @pytest.mark.parametrize('hour,minute,included', [(23,59,False), (0,0,True), (8,59,True)])
+    def test_feed_calendar_boundary(sample, hour, minute, included):
+        date = NOW - timedelta(days=1) if hour == 23 else NOW
+        db.session.add(ListeningEvent(user_id='friend', song_id='s0', listened_at=date.replace(hour=hour, minute=minute)))
+        db.session.commit()
+        with patch('services.feed_service.datetime') as clock:
+            clock.now.return_value = NOW
+            response = sample.get('/feed/owner/listening-now')
+            assert response.status_code == 200
+>           assert response.json['count'] == int(included)
+E           assert 1 == 0
+E            +  where 0 = int(False)
+
+tests/test_regressions.py:58: AssertionError
+________________ test_search_preserves_tags_and_distinct_songs _________________
+
+sample = <FlaskClient <Flask 'app'>>
+
+    def test_search_preserves_tags_and_distinct_songs(sample):
+        results = sample.get('/songs/search?q=aNtHeM').json
+>       assert results['count'] == 3
+E       assert 5 == 3
+
+tests/test_regressions.py:77: AssertionError
+_____________________ test_rating_notification_and_updates _____________________
+
+sample = <FlaskClient <Flask 'app'>>
+
+    def test_rating_notification_and_updates(sample):
+        response = sample.post('/songs/s0/rate', json={'user_id':'friend','score':5})
+        assert response.status_code == 201
+        notices = sample.get('/users/owner/notifications').json
+>       assert notices['count'] == 1
+E       assert 0 == 1
+
+tests/test_regressions.py:91: AssertionError
+____________________ test_playlist_boundaries_and_order[1] _____________________
+
+sample = <FlaskClient <Flask 'app'>>, count = 1
+
+    @pytest.mark.parametrize('count', [0, 1, 3])
+    def test_playlist_boundaries_and_order(sample, count):
+        for i in reversed(range(count)):
+            db.session.execute(playlist_entries.insert().values(playlist_id='p',song_id=f's{i}',position=i+1,added_by='friend'))
+        db.session.commit()
+        response = sample.get('/playlists/p/songs')
+        assert response.status_code == 200
+>       assert [s['id'] for s in response.json['songs']] == [f's{i}' for i in range(count)]
+E       AssertionError: assert [] == ['s0']
+E         
+E         Right contains one more item: 's0'
+E         Use -v to get more diff
+
+tests/test_regressions.py:119: AssertionError
+____________________ test_playlist_boundaries_and_order[3] _____________________
+
+sample = <FlaskClient <Flask 'app'>>, count = 3
+
+    @pytest.mark.parametrize('count', [0, 1, 3])
+    def test_playlist_boundaries_and_order(sample, count):
+        for i in reversed(range(count)):
+            db.session.execute(playlist_entries.insert().values(playlist_id='p',song_id=f's{i}',position=i+1,added_by='friend'))
+        db.session.commit()
+        response = sample.get('/playlists/p/songs')
+        assert response.status_code == 200
+>       assert [s['id'] for s in response.json['songs']] == [f's{i}' for i in range(count)]
+E       AssertionError: assert ['s0', 's1'] == ['s0', 's1', 's2']
+E         
+E         Right contains one more item: 's2'
+E         Use -v to get more diff
+
+tests/test_regressions.py:119: AssertionError
+_________________ test_playlist_add_workflow_and_notification __________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x107823650>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x1078da490>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x1079f9850>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x107832710>
+parameters = [('p', 's0', '2026-10-16 14:45:05.568641')]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1946: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x1078da490>
+cursor = <sqlite3.Cursor object at 0x107854e40>
+statement = 'INSERT INTO playlist_entries (playlist_id, song_id, added_at) VALUES (?, ?, ?)'
+parameters = ('p', 's0', '2026-10-16 14:45:05.568641')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x1079f9850>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: NOT NULL constraint failed: playlist_entries.position
+
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py:1192: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+sample = <FlaskClient <Flask 'app'>>
+
+    def test_playlist_add_workflow_and_notification(sample):
+        for i in range(3):
+>           assert sample.post('/playlists/p/songs',json={'song_id':f's{i}','added_by':'friend'}).status_code == 201
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_regressions.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/werkzeug/test.py:1171: in post
+    return self.open(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/flask/testing.py:235: in open
+    response = super().open(
+.venv/lib/python3.13/site-packages/werkzeug/test.py:1120: in open
+    response_parts = self.run_wsgi_app(request.environ, buffered=buffered)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/werkzeug/test.py:992: in run_wsgi_app
+    rv = run_wsgi_app(self.application, environ, buffered=buffered)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/werkzeug/test.py:1268: in run_wsgi_app
+    app_rv = app(environ, start_response)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/flask/app.py:1536: in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/flask/app.py:1514: in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/flask/app.py:1511: in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/flask/app.py:919: in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/flask/app.py:917: in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/flask/app.py:902: in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+routes/playlists.py:51: in add_song
+    add_to_playlist(playlist_id, song_id, added_by)
+services/notification_service.py:62: in add_to_playlist
+    db.session.commit()
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py:611: in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:2095: in commit
+    trans.commit(_to_root=True)
+<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction.commit>:2: in commit
+    return target(fn, self, _to_root=_to_root)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:1330: in commit
+    self._prepare_impl()
+<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction._prepare_impl>:2: in _prepare_impl
+    return target(fn, self)
+           ^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:1304: in _prepare_impl
+    self.session.flush()
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:4536: in flush
+    self._flush(objects)
+<sqlalchemy generated warned() wrapper for sqlalchemy.orm.session.Session._flush>:2: in _flush
+    return target(fn, self, objects=objects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/util/deprecations.py:281: in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:4679: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py:4640: in _flush
+    flush_context.execute()
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py:467: in execute
+    rec.execute(self)
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py:592: in execute
+    self.dependency_processor.process_saves(uow, states)
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/dependency.py:1199: in process_saves
+    self._run_crud(
+.venv/lib/python3.13/site-packages/sqlalchemy/orm/dependency.py:1262: in _run_crud
+    connection.execute(statement, secondary_insert)
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1451: in execute
+    return meth(
+.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1671: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1825: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1965: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py:1946: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x1078da490>
+cursor = <sqlite3.Cursor object at 0x107854e40>
+statement = 'INSERT INTO playlist_entries (playlist_id, song_id, added_at) VALUES (?, ?, ?)'
+parameters = ('p', 's0', '2026-10-16 14:45:05.568641')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x1079f9850>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: playlist_entries.position
+E       [SQL: INSERT INTO playlist_entries (playlist_id, song_id, added_at) VALUES (?, ?, ?)]
+E       [parameters: ('p', 's0', '2026-10-16 14:45:05.568641')]
+E       (Background on this error at: https://sqlalche.me/e/21/gkpj)
+
+.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py:1192: IntegrityError
+=========================== short test summary info ============================
+FAILED tests/test_regressions.py::test_sunday_streak_api - assert 1 == 13
+FAILED tests/test_regressions.py::test_feed_calendar_boundary[23-59-False] - ...
+FAILED tests/test_regressions.py::test_search_preserves_tags_and_distinct_songs
+FAILED tests/test_regressions.py::test_rating_notification_and_updates - asse...
+FAILED tests/test_regressions.py::test_playlist_boundaries_and_order[1] - Ass...
+FAILED tests/test_regressions.py::test_playlist_boundaries_and_order[3] - Ass...
+FAILED tests/test_regressions.py::test_playlist_add_workflow_and_notification
+7 failed, 5 passed in 0.86s
