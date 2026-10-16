@@ -4,6 +4,14 @@
 
 Aamori requested that Codex complete the implementation. Codex inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared this architecture map before modifying application code. Subsequent investigation, code, tests, and documentation are AI-assisted work. This document reports actions performed by Codex; it does not claim Aamori personally performed them. Student review is still required before submission.
 
+### Specific AI work and verification
+
+1. **Architecture and execution tracing:** The request directed Codex to inspect the real assignment and starter. Codex traced the rating endpoint through `rate_song()`, compared it with the playlist notification path, and identified the absent notification call. The saved-rating/empty-notification API reproduction verified that explanation instead of accepting it from code inspection alone.
+2. **Boundary and query debugging:** Codex inspected the streak weekday condition, feed cutoff, and search join, then authored deterministic tests to check Sunday, midnight, and tag cardinality. Tests failed against the unchanged starter before the targeted fixes and passed afterward.
+3. **Correction during validation:** The expected playlist-add workflow could not run because the starter relationship append omitted required association metadata. The actual IntegrityError disproved the assumption that only retrieval needed repair. Codex added a separate insertion fix and verified ordering and notifications through the API.
+
+These are agent-performed checks. Aamori's personal review is not represented as completed; see the student review section at the end.
+
 ## Codebase map
 
 This architectural orientation was recorded before bug reproduction and implementation.
