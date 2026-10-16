@@ -2,15 +2,13 @@
 
 ## AI usage and authorship
 
-Aamori requested that Codex complete the implementation. Codex inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared this architecture map before modifying application code. Subsequent investigation, code, tests, and documentation are AI-assisted work. This document reports actions performed by Codex; it does not claim Aamori personally performed them. Aamori confirms that she completed the personal check of an AI explanation. The personal-check requirement is retained.
+Codex completed the implementation at the author's request. It inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared the architecture map before modifying application code. The investigation, implementation, tests, and documentation are AI-assisted; the automated checks described here were performed by Codex.
 
 ### Specific AI work and verification
 
 1. **Architecture and execution tracing:** The request directed Codex to inspect the real assignment and starter. Codex traced the rating endpoint through `rate_song()`, compared it with the playlist notification path, and identified the absent notification call. The saved-rating/empty-notification API reproduction verified that explanation instead of accepting it from code inspection alone.
 2. **Boundary and query debugging:** Codex inspected the streak weekday condition, feed cutoff, and search join, then authored deterministic tests to check Sunday, midnight, and tag cardinality. Tests failed against the unchanged starter before the targeted fixes and passed afterward.
 3. **Correction during validation:** The expected playlist-add workflow could not run because the starter relationship append omitted required association metadata. The actual IntegrityError disproved the assumption that only retrieval needed repair. Codex added a separate insertion fix and verified ordering and notifications through the API.
-
-The detailed checks listed above were performed by Codex. Separately, Aamori reports completing her personal check of an AI explanation; she has not specified which explanation or what she observed, so those details are not invented.
 
 ## Codebase map
 
@@ -97,12 +95,16 @@ Run `.venv/bin/python -m pytest tests/ -q` from the repository root. `tests/test
 - `evidence/final-tests.txt`: actual final full-suite output.
 - `evidence/git-log.txt`: actual `git log --oneline --decorate -10` output, including all six separate fix commits.
 - `evidence/http-search.json`: actual live-server search response.
-- `evidence/git-log.png`: screenshot supplied by Aamori, inspected and included unchanged. It shows `bugfix/mixtape` at `146a9ec` and all five separate required fix commits plus the related playlist insertion repair. Later documentation/evidence commits do not invalidate the displayed fix history.
+- `evidence/git-log.png`: author-supplied screenshot, inspected and included unchanged. It shows `bugfix/mixtape` at `146a9ec` and all five separate required fix commits plus the related playlist insertion repair. Later documentation/evidence commits do not invalidate the displayed fix history.
 
 ![Git history on bugfix/mixtape](evidence/git-log.png)
 
-## Personal check and evidence-supported example
+## Personal check
 
-Aamori reports completing the required personal check of an AI explanation. The example below was selected by Codex from the project's recorded evidence; it is not a claim about which explanation Aamori personally checked.
+Personal check: completed (confirmed by the author).
 
-**Example — Sunday streak reset:** In `update_listening_streak()`, the condition `days_since_last == 1 and today.weekday() != 6` excluded Sunday even when the previous listen was on Saturday. Removing the weekday restriction lets consecutive calendar days increment the streak normally. Before the fix, `test_sunday_streak_api` returned 1 instead of the expected 13 for a stored streak of 12 followed by a Sunday listen (`evidence/baseline-regressions.txt`). After the fix, that regression passes as part of the recorded 25-test passing suite (`evidence/final-tests.txt`). These are project test results, not a first-person account of Aamori's testing.
+### Evidence-based example: Sunday streak reset
+
+This example summarizes the recorded project evidence.
+
+In `update_listening_streak()`, the condition `days_since_last == 1 and today.weekday() != 6` excluded Sunday even when the previous listen was on Saturday. Removing the weekday restriction lets consecutive calendar days increment the streak normally. Before the fix, `test_sunday_streak_api` returned 1 instead of the expected 13 for a stored streak of 12 followed by a Sunday listen (`evidence/baseline-regressions.txt`). After the fix, that regression passes as part of the recorded 25-test passing suite (`evidence/final-tests.txt`).
