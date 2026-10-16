@@ -1,0 +1,33 @@
+# Project 5 — Mixtape Bug Hunt
+
+## AI usage and authorship
+
+Aamori requested that Codex complete the implementation. Codex inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared this architecture map before modifying application code. Subsequent investigation, code, tests, and documentation are AI-assisted work. This document reports actions performed by Codex; it does not claim Aamori personally performed them. Student review is still required before submission.
+
+## Codebase map
+
+This architectural orientation was recorded before bug reproduction and implementation.
+
+| File or group | Responsibility and connections |
+|---|---|
+| `app.py` | Defines the shared SQLAlchemy extension and `create_app(config)` factory; configures SQLite, registers four route blueprints, and creates tables. Test configuration can select an in-memory database. |
+| `models.py` | Defines User, Tag, Song, ListeningEvent, Rating, Playlist, and Notification. UUIDs identify rows. `friendships` links users, `song_tags` links songs and tags, and `playlist_entries` stores song membership with position, adding user, and timestamp. Rating has a unique user/song constraint. Model `to_dict()` methods shape JSON. |
+| `routes/songs.py` | Parses search queries and rating/listening JSON, delegates to search, notification, and streak services, and serializes service results. |
+| `routes/playlists.py` | Exposes playlist creation, metadata, ordered songs, and adding a song. Delegates reads to playlist service and additions to notification service. |
+| `routes/users.py` | Provides profiles, streaks, notification lists, unread filtering, and marking notifications read. |
+| `routes/feed.py` | Provides listening-now and activity endpoints, returning a feed and its count. |
+| `services/streak_service.py` | Records listening events, updates stored streak state using calendar dates, and retrieves the stored streak. |
+| `services/feed_service.py` | Queries friends' listening events, sorts newest first, and produces either one latest entry per friend or a general limited activity list. |
+| `services/search_service.py` | Searches title/artist case-insensitively and returns serialized songs including tags; also retrieves individual songs. |
+| `services/notification_service.py` | Persists ratings and playlist additions, creates notifications, retrieves notification lists, and changes read state. |
+| `services/playlist_service.py` | Creates playlists, retrieves metadata, queries song membership ordered by its explicit position, and lists a user's playlists. |
+| `seed_data.py` | Recreates the configured database with sample users, friendships, tags, songs, playlists, events, and a notification. It is a destructive reset of that database and is only used for this new project's local sample database. |
+| `tests/` | Pytest fixtures create isolated in-memory databases; existing tests exercise streak rules, tag-count variations in search, and playlist membership/order. |
+
+### Data flow: rating a song
+
+`POST /songs/<song_id>/rate` enters `routes/songs.rate()`. The route extracts `user_id` and `score`, checks required fields, converts the score to an integer, and calls `notification_service.rate_song()`. The service validates the score range, loads Song and User by UUID, looks for the user's existing Rating for that song, and updates it or adds a new Rating. SQLAlchemy persists the transaction. The returned Rating's `to_dict()` becomes a JSON response with status 201; validation errors become status 400.
+
+### Organization patterns
+
+Routes handle HTTP parsing and response formatting; services contain business logic and database queries. Models centralize relationships and serialization. The application factory supports isolated test databases. Time-producing code uses UTC, while SQLite DateTime retrieval may yield naive datetimes representing UTC. Playlist order is explicit data in the association table, not the order of song IDs.
