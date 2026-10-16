@@ -73,3 +73,22 @@ Routes handle HTTP parsing and response formatting; services contain business lo
 - **The root cause:** `songs[:-1]` excludes the final element of the already ordered result. The highest-position song is always missing; when another entry is added, the previously final song moves inside the slice and the new one becomes excluded.
 - **Your fix:** Serialize the whole `songs` list, preserving the existing ordering query and response shape.
 - **Your side-effect check:** Six playlist retrieval tests pass (three original plus empty/single/multiple API cases). New fixtures insert rows in reverse order to verify sorting is by position rather than insertion order. They also check metadata and 404 behavior. The add-and-re-fetch path required the related repair below before its end-to-end test could pass.
+
+### Related repair — playlist insertion required by the reproduction workflow
+
+The baseline API add test raised `IntegrityError: NOT NULL constraint failed: playlist_entries.position`. Tracing `routes/playlists.add_song()` → `notification_service.add_to_playlist()` → `models.playlist_entries` showed that `playlist.songs.append(song)` supplies membership IDs but not mandatory `position` or `added_by`. Replaced that append with an explicit association-table insert, using the playlist's maximum position plus one and the supplied adding user. Re-adding a song returns without inserting or notifying again. This repair is a separate sixth fix commit rather than being hidden in one of the five required fixes.
+
+The end-to-end regression adds three songs through HTTP routes, re-fetches after every add, checks all songs are visible, confirms positions 1/2/3 and adding-user metadata, checks playlist-add notifications, and verifies repeated addition does not duplicate membership or notifications. All 25 tests pass after this repair. This retains the starter's single-process local-app assumptions; concurrent writers would need stronger ordering/transaction design for a production deployment.
+
+## Regression tests and evidence
+
+Run `.venv/bin/python -m pytest tests/ -q` from the repository root. `tests/test_regressions.py` adds 12 deterministic cases to the original 13 tests, using independent in-memory databases and frozen service clocks. Before implementation, 7 new cases failed and 5 passed; after implementation all 25 pass. In particular, `test_feed_calendar_boundary[23-59-False]` would catch the rolling-24-hour bug: it failed before the midnight fix and passes afterward. The suite also demonstrates all five reported failures and checks nearby behavior.
+
+- `evidence/baseline-tests.txt`: actual original-suite output, 4 failed / 9 passed.
+- `evidence/baseline-regressions.txt`: actual pre-fix new-suite output, 7 failed / 5 passed.
+- `evidence/final-tests.txt`: actual final full-suite output.
+- `evidence/git-log.png`: actual commit-history screenshot (prepared after the fixes).
+
+## Student review before submission
+
+No first-person learning experience or personal verification is asserted here. The rubric asks for an instance where the student verified an AI explanation. Aamori must personally review and then describe one real check, for example running the Sunday test and inspecting the removed weekday condition, or inspecting the before/after feed boundary output. Add what was checked and what was concluded only after doing it. This personal verification point cannot honestly be completed by an autonomous agent on the student's behalf.
