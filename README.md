@@ -1,5 +1,9 @@
 # Mixtape
 
+**Project author: Aamori Freeman**
+
+Completed Unit 5 project: see [submission.md](submission.md) for the codebase map, bug analyses, AI usage, and test evidence. Built on the CodePath Mixtape starter.
+
 A social music app where friends share songs, build collaborative playlists, and track listening stats.
 
 This is the starter repo for **Project 5: Mixtape Bug Hunt**. The app has five open issues in its tracker. Your job is to find, fix, and document at least three of them.

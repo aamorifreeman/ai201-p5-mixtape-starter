@@ -1,8 +1,10 @@
 # Project 5 — Mixtape Bug Hunt
 
-## AI usage and authorship
+**Project author: Aamori Freeman**
 
-Codex completed the implementation at the author's request. It inspected the authenticated assignment and rubric, read the starter README, models, routes, and services, and prepared the architecture map before modifying application code. The investigation, implementation, tests, and documentation are AI-assisted; the automated checks described here were performed by Codex.
+## AI usage
+
+I used Codex to identify failing test cases and bugs, trace their root causes, and help complete the fixes, regression tests, and documentation. Codex also ran the automated checks reported below. The specific uses and recorded results are described here.
 
 ### Specific AI work and verification
 
