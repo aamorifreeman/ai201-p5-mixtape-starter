@@ -4,13 +4,13 @@
 
 ## AI usage
 
-I used Codex to identify failing test cases and bugs, trace their root causes, and help complete the fixes, regression tests, and documentation. Codex also ran the automated checks reported below. The specific uses and recorded results are described here.
+I used Codex to identify failing test cases and bugs, trace their root causes, and help complete the fixes, regression tests, and documentation. This assistance included running the automated checks reported below.
 
 ### Specific AI work and verification
 
-1. **Architecture and execution tracing:** The request directed Codex to inspect the real assignment and starter. Codex traced the rating endpoint through `rate_song()`, compared it with the playlist notification path, and identified the absent notification call. The saved-rating/empty-notification API reproduction verified that explanation instead of accepting it from code inspection alone.
-2. **Boundary and query debugging:** Codex inspected the streak weekday condition, feed cutoff, and search join, then authored deterministic tests to check Sunday, midnight, and tag cardinality. Tests failed against the unchanged starter before the targeted fixes and passed afterward.
-3. **Correction during validation:** The expected playlist-add workflow could not run because the starter relationship append omitted required association metadata. The actual IntegrityError disproved the assumption that only retrieval needed repair. Codex added a separate insertion fix and verified ordering and notifications through the API.
+1. **Architecture and execution tracing:** AI-assisted tracing of the rating endpoint through `rate_song()` and comparison with the playlist notification path identified the absent notification call. The saved-rating/empty-notification API reproduction verified that explanation instead of accepting it from code inspection alone.
+2. **Boundary and query debugging:** AI-assisted inspection covered the streak weekday condition, feed cutoff, and search join, with generated deterministic tests for Sunday, midnight, and tag cardinality. Tests failed against the unchanged starter before the targeted fixes and passed afterward.
+3. **Correction during validation:** The expected playlist-add workflow could not run because the starter relationship append omitted required association metadata. The actual IntegrityError disproved the assumption that only retrieval needed repair. A separate insertion fix and API checks addressed ordering and notifications.
 
 ## Codebase map
 
@@ -45,7 +45,7 @@ Routes handle HTTP parsing and response formatting; services contain business lo
 **Issue #1 — My listening streak keeps resetting**
 
 - **How you reproduced it:** Before fixes, the original Sunday test failed with 1 instead of 2. The added API test sets a stored streak of 12 and a Saturday timestamp, freezes the clock at Sunday June 16, 2024 09:00 UTC, posts a listen, then fetches the streak. It returned 1 instead of 13 (`evidence/baseline-regressions.txt`).
-- **How you found the root cause:** Codex traced `routes/songs.listen()` → `record_listening_event()` → `update_listening_streak()`, then checked the stored result through `routes/users.streak()` → `get_streak()`. The consecutive-day branch explicitly excluded weekday 6; the controlled Sunday failure confirmed this condition, rather than persistence or the GET endpoint, caused the reset.
+- **How you found the root cause:** The investigation traced `routes/songs.listen()` → `record_listening_event()` → `update_listening_streak()`, then checked the stored result through `routes/users.streak()` → `get_streak()`. The consecutive-day branch explicitly excluded weekday 6; the controlled Sunday failure confirmed this condition, rather than persistence or the GET endpoint, caused the reset.
 - **The root cause:** `days_since_last == 1 and today.weekday() != 6` rejects Sunday even when the calendar date difference is exactly one. Sunday therefore falls into the reset branch. Consecutive-day counting must depend on elapsed calendar dates, not the weekday number.
 - **Your fix:** Removed the Sunday exclusion; all one-day differences increment the streak.
 - **Your side-effect check:** All five original streak tests and the new API test pass (6 total). These cover first listen, ordinary consecutive days, skipped days, Saturday→Sunday→Monday, same-day repeats, and event persistence (three listens still create three events while counting only two new days).
@@ -53,7 +53,7 @@ Routes handle HTTP parsing and response formatting; services contain business lo
 **Issue #2 — Friends Listening Now shows people from yesterday**
 
 - **How you reproduced it:** At a frozen Sunday 09:00 UTC, inserted a friend's listen from Saturday 23:59 and requested `/feed/owner/listening-now`. Before the fix its count was 1; expected 0. Fixtures use an isolated in-memory database rather than relying on the wall clock or seed timing.
-- **How you found the root cause:** Codex followed `routes/feed.listening_now()` into `get_friends_listening_now()`, then inspected the event timestamp filter, ordering, and per-friend deduplication. The failing fixture was newer than the computed 24-hour cutoff but older than midnight, isolating the cutoff as the cause.
+- **How you found the root cause:** The investigation followed `routes/feed.listening_now()` into `get_friends_listening_now()`, then inspected the event timestamp filter, ordering, and per-friend deduplication. The failing fixture was newer than the computed 24-hour cutoff but older than midnight, isolating the cutoff as the cause.
 - **The root cause:** Subtracting `RECENT_THRESHOLD` (24 hours) creates a rolling interval. Yesterday at 23:59 is still inside that interval at 09:00 today, although it is not on today's calendar date. The app uses UTC timestamps and has no user timezone field, so the calendar boundary is UTC midnight.
 - **Your fix:** Compute today's midnight UTC with `replace(hour=0, minute=0, second=0, microsecond=0)` and retain the inclusive `>=` timestamp filter. Removed the unused rolling-threshold constant/import and clarified the docstring.
 - **Your side-effect check:** Four feed test cases pass: yesterday 23:59 excluded, midnight included, today 08:59 included, and multiple events reduced to the latest per friend. The tests also verify strangers are excluded, friendless users get an empty list, missing users get 404, and the general activity feed still includes yesterday's event.
@@ -61,7 +61,7 @@ Routes handle HTTP parsing and response formatting; services contain business lo
 **Issue #3 — The same song keeps showing up twice in search**
 
 - **How you reproduced it:** The original three-tag Crown Heights test returned three copies instead of one. The added `/songs/search?q=aNtHeM` test seeds three different songs with three, one, and zero tags; the response contained five entries instead of three before the fix.
-- **How you found the root cause:** Codex followed `routes/songs.search()` → `search_service.search_songs()` → `Song.to_dict()` and the `Song.tags` relationship in `models.py`. The SQL outer join produces one row per tag, and `execute(...).scalars().all()` preserves these repeated Song results. The reproduction's 3+1+1 count matches the join cardinality exactly.
+- **How you found the root cause:** The investigation followed `routes/songs.search()` → `search_service.search_songs()` → `Song.to_dict()` and the `Song.tags` relationship in `models.py`. The SQL outer join produces one row per tag, and `execute(...).scalars().all()` preserves these repeated Song results. The reproduction's 3+1+1 count matches the join cardinality exactly.
 - **The root cause:** Joining `song_tags` multiplies matching rows for multi-tag songs even though neither filtering nor serialization requires that join. Zero-tag songs get one outer-join row, one-tag songs get one row, and three-tag songs get three. It is not a second HTTP request or repeated seed insertion.
 - **Your fix:** Removed the unnecessary outer join and unused imports. The query selects songs directly; SQLAlchemy's existing `Song.tags` relationship still supplies every tag for serialization. Different songs remain separate even if their titles match.
 - **Your side-effect check:** All five original search tests and the new API test pass (6 total). Verified zero/one/multiple tags, full tag preservation, case-insensitive title and artist matches, no matches, and a missing query returning 400.
@@ -69,7 +69,7 @@ Routes handle HTTP parsing and response formatting; services contain business lo
 **Issue #4 — I got notified when a friend added my song to a playlist but not when they rated it**
 
 - **How you reproduced it:** Posted a 5-star rating by `friend` for `owner`'s song through `/songs/s0/rate`. The endpoint returned 201 and stored the rating, but `/users/owner/notifications` returned count 0 instead of 1. The baseline log records this failure.
-- **How you found the root cause:** Codex traced the rating route into `notification_service.rate_song()`, compared that function with `add_to_playlist()` and `create_notification()` in the same module, and followed notification retrieval through `routes/users.py`. The rating was persisted, but its service never called the helper that creates Notification rows; the empty list was therefore not a retrieval-filter problem.
+- **How you found the root cause:** The investigation traced the rating route into `notification_service.rate_song()`, compared that function with `add_to_playlist()` and `create_notification()` in the same module, and followed notification retrieval through `routes/users.py`. The rating was persisted, but its service never called the helper that creates Notification rows; the empty list was therefore not a retrieval-filter problem.
 - **The root cause:** Rating persistence and notification generation are separate operations in the service layer. The playlist path explicitly invokes `create_notification()` for the song sharer, while the rating path committed and immediately returned. Saving a Rating has no model hook that automatically creates a notification.
 - **Your fix:** After saving the rating, call the existing helper with type `song_rated`, recipient `song.shared_by`, and a body identifying the rater, song, and score. Follow the existing self-interaction exclusion. Both new ratings and score updates notify the sharer; updates still reuse the original Rating row.
 - **Your side-effect check:** Both rating tests pass. They verify recipient/type/body, rating updates without duplicate Rating rows, no self-notifications, rejection of scores 0/6 and nonexistent users/songs, and read/unread filtering. Playlist notification coverage is also included in the related insertion test below.
@@ -77,7 +77,7 @@ Routes handle HTTP parsing and response formatting; services contain business lo
 **Issue #5 — The last song in a playlist never shows up**
 
 - **How you reproduced it:** Before fixes, the original five-song fixture returned only four songs. The added API tests directly populate ordered association rows: a one-song playlist returned an empty list and a three-song playlist returned two songs. Direct insertion isolated retrieval from the separate insertion failure.
-- **How you found the root cause:** Codex followed `routes/playlists.get_songs()` into `playlist_service.get_playlist_songs()`, checked the membership join and ascending position sort, then inspected the final list comprehension. The query returns every row, but serialization slices off the last element. A single-song fixture becoming empty confirms the loss occurs after querying.
+- **How you found the root cause:** The investigation followed `routes/playlists.get_songs()` into `playlist_service.get_playlist_songs()`, checked the membership join and ascending position sort, then inspected the final list comprehension. The query returns every row, but serialization slices off the last element. A single-song fixture becoming empty confirms the loss occurs after querying.
 - **The root cause:** `songs[:-1]` excludes the final element of the already ordered result. The highest-position song is always missing; when another entry is added, the previously final song moves inside the slice and the new one becomes excluded.
 - **Your fix:** Serialize the whole `songs` list, preserving the existing ordering query and response shape.
 - **Your side-effect check:** Six playlist retrieval tests pass (three original plus empty/single/multiple API cases). New fixtures insert rows in reverse order to verify sorting is by position rather than insertion order. They also check metadata and 404 behavior. The add-and-re-fetch path required the related repair below before its end-to-end test could pass.
@@ -103,7 +103,7 @@ Run `.venv/bin/python -m pytest tests/ -q` from the repository root. `tests/test
 
 ## Personal check
 
-Personal check: completed (confirmed by the author).
+Personal check: completed.
 
 ### Evidence-based example: Sunday streak reset
 
